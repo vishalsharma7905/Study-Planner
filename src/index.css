@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 20% 97%;
+    --foreground: 240 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 20% 10%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 262 40% 95%;
+    --secondary-foreground: 262 83% 40%;
+
+    --muted: 250 15% 94%;
+    --muted-foreground: 240 10% 46%;
+
+    --accent: 262 40% 95%;
+    --accent-foreground: 262 83% 40%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 250 15% 90%;
+    --input: 250 15% 90%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 10% 46%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 262 40% 95%;
+    --sidebar-accent-foreground: 262 83% 40%;
+    --sidebar-border: 250 15% 92%;
+    --sidebar-ring: 262 83% 58%;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 4%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 4%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 5% 10%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 5% 10%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 240 5% 10%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    --success: 152 60% 35%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 40%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 240 5% 10%;
+    --input: 240 5% 10%;
+    --ring: 262 83% 58%;
+
+    --sidebar-background: 240 10% 4%;
+    --sidebar-foreground: 240 5% 65%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 10%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 5% 10%;
+    --sidebar-ring: 262 83% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
