@@ -106,7 +106,7 @@ export default function Dashboard({
                   />
                   <div className="flex-1">
                     <p className={`font-medium ${task.completed ? 'line-through' : ''}`}>
-                      {getSubjectName(subjects, task.subject_id)} – Topic {task.topic_number}
+                      {getSubjectName(subjects, task.subject_id)} – {task.topic_title || `Topic ${task.topic_number}`}
                     </p>
                     <p className="text-xs text-muted-foreground">{task.estimated_minutes} min</p>
                   </div>

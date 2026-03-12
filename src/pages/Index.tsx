@@ -4,12 +4,15 @@ import Dashboard from '@/components/Dashboard';
 import CalendarView from '@/components/CalendarView';
 import SubjectManager from '@/components/SubjectManager';
 import SettingsPanel from '@/components/SettingsPanel';
+import StudyTools from '@/components/StudyTools';
+import ProfilePanel from '@/components/ProfilePanel';
+import { UserNav } from '@/components/UserNav';
 import { useStudyPlanner } from '@/hooks/useStudyPlanner';
 import { Search, Bell } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
-type View = 'dashboard' | 'calendar' | 'subjects' | 'settings';
+type View = 'dashboard' | 'calendar' | 'subjects' | 'settings' | 'tools' | 'profile';
 
 const Index = () => {
   const [view, setView] = useState<View>('dashboard');
@@ -42,9 +45,7 @@ const Index = () => {
             <button className="p-2 rounded-lg hover:bg-accent transition-colors">
               <Bell className="h-5 w-5 text-muted-foreground" />
             </button>
-            <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
-              S
-            </div>
+            <UserNav onViewChange={setView} />
           </div>
         </header>
 
@@ -77,6 +78,7 @@ const Index = () => {
               onShowAddDialog={setShowAddDialog}
             />
           )}
+          {view === 'tools' && <StudyTools />}
           {view === 'settings' && (
             <SettingsPanel
               settings={planner.settings}
@@ -87,6 +89,7 @@ const Index = () => {
               hasTasks={planner.tasks.length > 0}
             />
           )}
+          {view === 'profile' && <ProfilePanel />}
         </div>
       </main>
     </div>

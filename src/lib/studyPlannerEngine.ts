@@ -83,6 +83,7 @@ export function generateStudyPlan(
 
   // Distribute sessions across study days
   const dayMinutesUsed: Record<string, number> = {};
+  const dayTopicsCount: Record<string, number> = {};
 
   for (const session of sessions) {
     const examDate = new Date(session.subject.exam_date);
@@ -93,12 +94,19 @@ export function generateStudyPlan(
       if (day > examDate) continue;
       const dateStr = toDateStr(day);
       const used = dayMinutesUsed[dateStr] || 0;
-      if (used + estimatedMinutes <= totalMinutesPerDay) {
+      const count = dayTopicsCount[dateStr] || 0;
+      
+      const withinMinutes = used + estimatedMinutes <= totalMinutesPerDay;
+      const withinTopicLimit = !settings.max_topics_per_day || count < settings.max_topics_per_day;
+
+      if (withinMinutes && withinTopicLimit) {
         dayMinutesUsed[dateStr] = used + estimatedMinutes;
+        dayTopicsCount[dateStr] = count + 1;
         tasks.push({
           id: `task-${taskId++}`,
           subject_id: session.subject.id,
           topic_number: session.topicNumber,
+          topic_title: session.subject.topic_titles?.[session.topicNumber - 1],
           scheduled_date: dateStr,
           completed: false,
           estimated_minutes: estimatedMinutes,
@@ -140,9 +148,11 @@ export function rescheduleUnfinished(
 
   // Calculate existing usage per day
   const dayMinutesUsed: Record<string, number> = {};
+  const dayTopicsCount: Record<string, number> = {};
   for (const t of futureTasks) {
     if (!t.completed) {
       dayMinutesUsed[t.scheduled_date] = (dayMinutesUsed[t.scheduled_date] || 0) + t.estimated_minutes;
+      dayTopicsCount[t.scheduled_date] = (dayTopicsCount[t.scheduled_date] || 0) + 1;
     }
   }
 
@@ -151,8 +161,14 @@ export function rescheduleUnfinished(
     for (const day of studyDays) {
       const dateStr = toDateStr(day);
       const used = dayMinutesUsed[dateStr] || 0;
-      if (used + missed.estimated_minutes <= totalMinutesPerDay) {
+      const count = dayTopicsCount[dateStr] || 0;
+      
+      const withinMinutes = used + missed.estimated_minutes <= totalMinutesPerDay;
+      const withinTopicLimit = !settings.max_topics_per_day || count < settings.max_topics_per_day;
+
+      if (withinMinutes && withinTopicLimit) {
         dayMinutesUsed[dateStr] = used + missed.estimated_minutes;
+        dayTopicsCount[dateStr] = count + 1;
         missed.scheduled_date = dateStr;
         break;
       }

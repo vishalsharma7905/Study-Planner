@@ -1,48 +1,84 @@
 import { Subject, StudyTask, StudySettings, StreakData } from './types';
-
-const KEYS = {
-  subjects: 'studyplanner_subjects',
-  tasks: 'studyplanner_tasks',
-  settings: 'studyplanner_settings',
-  streak: 'studyplanner_streak',
-};
-
-function load<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function save(key: string, data: unknown) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
+import { supabase } from './supabase';
 
 export const storage = {
-  getSubjects: (): Subject[] => load(KEYS.subjects, []),
-  setSubjects: (s: Subject[]) => save(KEYS.subjects, s),
+  getSubjects: async (): Promise<Subject[]> => {
+    const { data, error } = await supabase.from('subjects').select('*');
+    if (error) {
+      console.error('Error fetching subjects:', error);
+      return [];
+    }
+    return data || [];
+  },
+  
+  setSubjects: async (subjects: Subject[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-  getTasks: (): StudyTask[] => load(KEYS.tasks, []),
-  setTasks: (t: StudyTask[]) => save(KEYS.tasks, t),
+    const subjectsWithUser = subjects.map(s => ({ ...s, user_id: user.id }));
+    const { error } = await supabase.from('subjects').upsert(subjectsWithUser);
+    if (error) console.error('Error saving subjects:', error);
+  },
 
-  getSettings: (): StudySettings => {
-    const defaultSettings = {
+  getTasks: async (): Promise<StudyTask[]> => {
+    const { data, error } = await supabase.from('tasks').select('*');
+    if (error) {
+      console.error('Error fetching tasks:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  setTasks: async (tasks: StudyTask[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const tasksWithUser = tasks.map(t => ({ ...t, user_id: user.id }));
+    const { error } = await supabase.from('tasks').upsert(tasksWithUser);
+    if (error) console.error('Error saving tasks:', error);
+  },
+
+  getSettings: async (): Promise<StudySettings> => {
+    const defaultSettings: StudySettings = {
       hours_available_per_day: 3,
       preferred_study_days_per_week: 5,
       start_date: new Date().toLocaleDateString('en-CA'),
-      custom_holidays: [0, 6], // Default to Saturday and Sunday as breaks
+      custom_holidays: [0, 6],
     };
-    const loaded = load<StudySettings>(KEYS.settings, defaultSettings);
-    if (!loaded.custom_holidays) {
-      loaded.custom_holidays = [0, 6];
-    }
-    return loaded;
-  },
-  setSettings: (s: StudySettings) => save(KEYS.settings, s),
 
-  getStreak: (): StreakData =>
-    load(KEYS.streak, { current_streak: 0, longest_streak: 0, last_study_date: null }),
-  setStreak: (s: StreakData) => save(KEYS.streak, s),
+    const { data, error } = await supabase.from('settings').select('*').single();
+    if (error || !data) {
+      if (error && error.code !== 'PGRST116') console.error('Error fetching settings:', error);
+      return defaultSettings;
+    }
+    return data;
+  },
+
+  setSettings: async (settings: StudySettings) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const settingsWithUser = { ...settings, user_id: user.id };
+    const { error } = await supabase.from('settings').upsert(settingsWithUser);
+    if (error) console.error('Error saving settings:', error);
+  },
+
+  getStreak: async (): Promise<StreakData> => {
+    const defaultStreak: StreakData = { current_streak: 0, longest_streak: 0, last_study_date: null };
+    const { data, error } = await supabase.from('streaks').select('*').single();
+    if (error || !data) {
+      if (error && error.code !== 'PGRST116') console.error('Error fetching streak:', error);
+      return defaultStreak;
+    }
+    return data;
+  },
+
+  setStreak: async (streak: StreakData) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const streakWithUser = { ...streak, user_id: user.id };
+    const { error } = await supabase.from('streaks').upsert(streakWithUser);
+    if (error) console.error('Error saving streak:', error);
+  },
 };

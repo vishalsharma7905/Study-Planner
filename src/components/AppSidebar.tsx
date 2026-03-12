@@ -7,10 +7,11 @@ import {
   Settings,
   Flame,
   Plus,
+  Timer,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-type View = 'dashboard' | 'calendar' | 'subjects' | 'settings';
+type View = 'dashboard' | 'calendar' | 'subjects' | 'settings' | 'tools' | 'profile';
 
 interface SidebarProps {
   currentView: View;
@@ -23,6 +24,7 @@ const navItems: { view: View; label: string; icon: React.ElementType }[] = [
   { view: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { view: 'calendar', label: 'Calendar', icon: CalendarDays },
   { view: 'subjects', label: 'Subjects', icon: BookOpen },
+  { view: 'tools', label: 'Study Tools', icon: Timer },
   { view: 'settings', label: 'Settings', icon: Settings },
 ];
 

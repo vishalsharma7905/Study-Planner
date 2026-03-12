@@ -88,7 +88,7 @@ export default function CalendarView({ tasks, subjects, onCompleteTask }: Calend
                         {getSubjectName(subjects, task.subject_id)}
                       </span>
                     </div>
-                    <p className="text-muted-foreground">Topic {task.topic_number}</p>
+                    <p className="text-muted-foreground">{task.topic_title || `Topic ${task.topic_number}`}</p>
                   </Card>
                 ))}
               </div>

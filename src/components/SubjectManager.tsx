@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, Plus } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Trash2, Plus, ListChecks } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface SubjectManagerProps {
@@ -29,14 +30,34 @@ export default function SubjectManager({ subjects, onAdd, onDelete, showAddDialo
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [examDate, setExamDate] = useState('');
   const [totalTopics, setTotalTopics] = useState(10);
+  const [topicTitlesText, setTopicTitlesText] = useState('');
+
+  const handleTopicTitlesChange = (text: string) => {
+    setTopicTitlesText(text);
+    const titles = text.split('\n').filter(line => line.trim() !== '');
+    if (titles.length > 0) {
+      setTotalTopics(titles.length);
+    }
+  };
 
   const handleAdd = () => {
     if (!name || !examDate) return;
-    onAdd({ name, difficulty, exam_date: examDate, total_topics: totalTopics });
+    const topic_titles = topicTitlesText.split('\n').filter(line => line.trim() !== '');
+    const finalTotalTopics = topic_titles.length > 0 ? topic_titles.length : totalTopics;
+    
+    onAdd({ 
+      name, 
+      difficulty, 
+      exam_date: examDate, 
+      total_topics: finalTotalTopics,
+      topic_titles: topic_titles.length > 0 ? topic_titles : undefined
+    });
+    
     setName('');
     setDifficulty('medium');
     setExamDate('');
     setTotalTopics(10);
+    setTopicTitlesText('');
     onShowAddDialog(false);
   };
 
@@ -51,35 +72,66 @@ export default function SubjectManager({ subjects, onAdd, onDelete, showAddDialo
               Add Subject
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Add New Subject</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Subject Name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Mathematics" />
+            <div className="grid gap-6 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Subject Name</Label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Mathematics" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Difficulty</Label>
+                  <Select value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <Label>Difficulty</Label>
-                <Select value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Exam Date</Label>
+                  <Input type="date" value={examDate} onChange={(e) => setExamDate(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Total Topics</Label>
+                  <Input 
+                    type="number" 
+                    value={totalTopics} 
+                    onChange={(e) => setTotalTopics(Number(e.target.value))} 
+                    min={1} 
+                    disabled={topicTitlesText.split('\n').filter(line => line.trim() !== '').length > 0}
+                  />
+                  {topicTitlesText.split('\n').filter(line => line.trim() !== '').length > 0 && (
+                    <p className="text-[10px] text-muted-foreground italic">Controlled by topic list</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <Label>Exam Date</Label>
-                <Input type="date" value={examDate} onChange={(e) => setExamDate(e.target.value)} />
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-2">
+                    <ListChecks className="h-4 w-4 text-primary" />
+                    Topic Names (Optional)
+                  </Label>
+                  <span className="text-[10px] text-muted-foreground">One topic per line</span>
+                </div>
+                <Textarea 
+                  placeholder="Topic 1&#10;Topic 2&#10;Topic 3..." 
+                  value={topicTitlesText} 
+                  onChange={(e) => handleTopicTitlesChange(e.target.value)}
+                  className="min-h-[120px] font-mono text-xs"
+                />
               </div>
-              <div>
-                <Label>Total Topics</Label>
-                <Input type="number" value={totalTopics} onChange={(e) => setTotalTopics(Number(e.target.value))} min={1} />
-              </div>
-              <Button onClick={handleAdd} className="w-full">Add Subject</Button>
+
+              <Button onClick={handleAdd} className="w-full mt-2">Create Study Plan</Button>
             </div>
           </DialogContent>
         </Dialog>

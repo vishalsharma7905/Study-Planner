@@ -27,17 +27,45 @@ export default function SettingsPanel({
       <h2 className="text-lg font-semibold">Study Settings</h2>
 
       <Card className="p-6 space-y-4">
-        <div>
-          <Label>Hours Available Per Day</Label>
-          <Input
-            type="number"
-            min={1}
-            max={12}
-            value={settings.hours_available_per_day}
-            onChange={(e) =>
-              onUpdate({ ...settings, hours_available_per_day: Number(e.target.value) })
-            }
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Hours Per Day</Label>
+            <Input
+              type="number"
+              min={1}
+              max={12}
+              value={settings.hours_available_per_day}
+              onChange={(e) =>
+                onUpdate({ ...settings, hours_available_per_day: Number(e.target.value) })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Topics Per Day (Limit)</Label>
+            <Input
+              type="number"
+              min={1}
+              max={20}
+              placeholder="Unlimited"
+              value={settings.max_topics_per_day || ''}
+              onChange={(e) =>
+                onUpdate({ 
+                  ...settings, 
+                  max_topics_per_day: e.target.value ? Number(e.target.value) : undefined 
+                })
+              }
+            />
+          </div>
+        </div>
+        <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            <span className="font-semibold text-primary">Calculation:</span> At {settings.hours_available_per_day} hours/day, 
+            you can fit approx. <span className="text-foreground font-medium">{Math.floor(settings.hours_available_per_day * 60 / 20)}</span> easy topics 
+            or <span className="text-foreground font-medium">{Math.floor(settings.hours_available_per_day * 60 / 45)}</span> hard topics.
+            {settings.max_topics_per_day && (
+              <> Currently limited to <span className="text-primary font-bold">{settings.max_topics_per_day}</span> topics total.</>
+            )}
+          </p>
         </div>
         <div>
           <Label className="mb-3 block">Break Days</Label>
